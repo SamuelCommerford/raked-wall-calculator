@@ -1,0 +1,43 @@
+{% comment %}
+  Raked Wall Calculator — full-page embed
+  Add this file to your Shopify theme: Online Store → Edit Code → templates/page.calculator.liquid
+  Then create a new Page in Shopify admin and set its template to "calculator".
+{% endcomment %}
+
+{% layout 'theme' %}
+
+<style>
+  /* Hide default page heading and content padding */
+  .page-title,
+  .page__hero,
+  h1.page-title { display: none !important; }
+
+  main.content-for-layout,
+  #MainContent,
+  .main-content,
+  [id*="main"],
+  .page-width { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+
+  .calc-embed-wrap {
+    width: 100%;
+    height: 100svh; /* svh = small viewport height — accounts for mobile browser chrome */
+    min-height: 600px;
+    overflow: hidden;
+  }
+
+  .calc-embed-wrap iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+</style>
+
+<div class="calc-embed-wrap">
+  <iframe
+    src="https://tools.tradienotes.com.au"
+    title="Raked Wall Calculator by Tradie Notes"
+    allow="clipboard-write"
+    loading="eager">
+  </iframe>
+</div>
