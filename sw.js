@@ -1,11 +1,13 @@
-var CACHE = 'raked-wall-v1';
+var CACHE = 'raked-wall-v2';
 
+// Use scope so paths work whether hosted at / or /raked-wall-calculator/
+var scope = self.registration.scope;
 var CORE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  scope,
+  scope + 'index.html',
+  scope + 'manifest.json',
+  scope + 'icons/icon-192.png',
+  scope + 'icons/icon-512.png'
 ];
 
 // Cache core app shell on install
