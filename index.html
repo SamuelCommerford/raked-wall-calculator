@@ -177,13 +177,7 @@ footer a{color:var(--org);text-decoration:none}
 .pwa-text span{font-size:11px;color:var(--gry)}
 .pwa-btn{background:var(--org);color:var(--wht);border:none;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:10px 16px;border-radius:var(--r);cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .pwa-dismiss{background:none;border:none;color:var(--gry);font-size:18px;line-height:1;padding:8px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
-/* iOS modal */
-.ios-modal-backdrop{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center}
-.ios-modal{background:var(--blk3);border:1.5px solid var(--gryl);border-radius:var(--rl) var(--rl) 0 0;padding:24px 20px 32px;max-width:540px;width:100%}
-.ios-modal h3{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--wht);margin-bottom:16px}
-.ios-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;font-size:14px;color:var(--off);line-height:1.4}
-.ios-step-num{background:var(--org);color:#fff;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ios-close{width:100%;margin-top:20px;background:var(--steel);border:1.5px solid var(--gryl);color:var(--off);font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;letter-spacing:.1em;text-transform:uppercase;padding:14px;border-radius:var(--r);cursor:pointer}
+.pwa-ios-hint{font-size:11px;color:var(--org);margin-top:2px;display:none}
 
 /* ── SAFE AREA (iPhone notch/home bar) ── */
 @supports(padding:max(0px)){
@@ -408,30 +402,11 @@ footer a{color:var(--org);text-decoration:none}
     <div class="pwa-icon"><img src="icons/icon-192.png" alt=""/></div>
     <div class="pwa-text">
       <strong>Install App</strong>
-      <span>Add to home screen — works offline</span>
+      <span id="pwa-sub">Add to home screen — works offline</span>
+      <span id="pwa-ios-hint" class="pwa-ios-hint">Tap &#x2B06; Share → "Add to Home Screen"</span>
     </div>
     <button id="pwa-install-btn" class="pwa-btn">Install</button>
     <button id="pwa-dismiss-btn" class="pwa-dismiss" aria-label="Dismiss">&#x2715;</button>
-  </div>
-</div>
-
-<!-- iOS Install Instructions Modal -->
-<div id="ios-backdrop" class="ios-modal-backdrop" hidden>
-  <div class="ios-modal">
-    <h3>Add to Home Screen</h3>
-    <div class="ios-step">
-      <div class="ios-step-num">1</div>
-      <div>Tap the <strong>Share</strong> button at the bottom of your browser <span style="font-size:18px">&#x26D5;</span></div>
-    </div>
-    <div class="ios-step">
-      <div class="ios-step-num">2</div>
-      <div>Scroll down and tap <strong>"Add to Home Screen"</strong></div>
-    </div>
-    <div class="ios-step">
-      <div class="ios-step-num">3</div>
-      <div>Tap <strong>"Add"</strong> — the app icon will appear on your home screen</div>
-    </div>
-    <button id="ios-close-btn" class="ios-close">Got It</button>
   </div>
 </div>
 
@@ -665,7 +640,6 @@ renderTable();
 (function(){
   var deferredPrompt = null;
   var banner = document.getElementById('pwa-banner');
-  var iosBackdrop = document.getElementById('ios-backdrop');
 
   function isStandalone(){
     return !!(navigator.standalone || window.matchMedia('(display-mode: standalone)').matches);
@@ -676,6 +650,12 @@ renderTable();
   function showBanner(){
     if(isStandalone()) return;
     if(localStorage.getItem('pwa-dismissed')) return;
+    // On iOS swap subtitle for inline share instructions, hide the install button
+    if(isIOS()){
+      document.getElementById('pwa-sub').style.display = 'none';
+      document.getElementById('pwa-ios-hint').style.display = 'block';
+      document.getElementById('pwa-install-btn').style.display = 'none';
+    }
     banner.hidden = false;
   }
   function hideBanner(){
@@ -693,21 +673,12 @@ renderTable();
     if(deferredPrompt){
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function(){ deferredPrompt = null; hideBanner(); });
-    } else if(isIOS()){
-      iosBackdrop.hidden = false;
     }
   });
 
   document.getElementById('pwa-dismiss-btn').addEventListener('click', function(){
     localStorage.setItem('pwa-dismissed','1');
     hideBanner();
-  });
-
-  document.getElementById('ios-close-btn').addEventListener('click', function(){
-    iosBackdrop.hidden = true;
-  });
-  iosBackdrop.addEventListener('click', function(e){
-    if(e.target === iosBackdrop) iosBackdrop.hidden = true;
   });
 
   // Show banner for iOS users (no beforeinstallprompt fires on Safari)
