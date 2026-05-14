@@ -1,6 +1,5 @@
-var CACHE = 'raked-wall-v2';
+var CACHE = 'raked-wall-v3';
 
-// Use scope so paths work whether hosted at / or /raked-wall-calculator/
 var scope = self.registration.scope;
 var CORE = [
   scope,
@@ -10,7 +9,6 @@ var CORE = [
   scope + 'icons/icon-512.png'
 ];
 
-// Cache core app shell on install
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(c) { return c.addAll(CORE); })
@@ -18,7 +16,6 @@ self.addEventListener('install', function(e) {
   self.skipWaiting();
 });
 
-// Clean up old caches on activate
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
@@ -30,17 +27,24 @@ self.addEventListener('activate', function(e) {
   self.clients.claim();
 });
 
-// Cache-first for same-origin assets; network-first for CDN/external
 self.addEventListener('fetch', function(e) {
   var url = new URL(e.request.url);
-
-  // Only handle GET requests
   if (e.request.method !== 'GET') return;
 
-  // For same-origin requests: cache-first, update cache in background
   if (url.origin === self.location.origin) {
     e.respondWith(
       caches.open(CACHE).then(function(c) {
+        // Navigation requests: serve cache immediately, no network wait
+        if (e.request.mode === 'navigate') {
+          return c.match(e.request).then(function(cached) {
+            if (cached) return cached;
+            // Fallback to index.html shell for any navigation miss
+            return c.match(scope + 'index.html').then(function(shell) {
+              return shell || fetch(e.request);
+            });
+          });
+        }
+        // Sub-resources: cache-first, update in background
         return c.match(e.request).then(function(cached) {
           var network = fetch(e.request).then(function(res) {
             if (res.ok) c.put(e.request, res.clone());
@@ -53,7 +57,7 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  // For external requests (Google Fonts, Shopify CDN images): cache on first load, serve from cache offline
+  // External: Google Fonts + Shopify CDN — cache on first load
   if (url.hostname.includes('fonts.googleapis.com') ||
       url.hostname.includes('fonts.gstatic.com') ||
       url.hostname.includes('cdn.shopify.com')) {

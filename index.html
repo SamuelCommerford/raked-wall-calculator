@@ -189,6 +189,12 @@ footer a{color:var(--org);text-decoration:none}
 </style>
 </head>
 <body>
+<!-- Splash: inline so it renders before any CSS or JS loads — eliminates white screen -->
+<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+  <img src="icons/icon-192.png" width="88" height="88" style="border-radius:20px;box-shadow:0 4px 24px rgba(242,101,34,.35)"/>
+  <div style="width:38px;height:38px;border:3px solid #2a2a2a;border-top-color:#f26522;border-radius:50%;animation:_spin .75s linear infinite"></div>
+  <style>@keyframes _spin{to{transform:rotate(360deg)}}#splash{transition:opacity .25s}#splash.out{opacity:0}</style>
+</div>
 
 <!-- STICKY HEADER — stays visible while scrolling -->
 <div class="sticky-top">
@@ -688,5 +694,13 @@ renderTable();
 })();
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
+<script>
+window.addEventListener('load', function() {
+  var s = document.getElementById('splash');
+  if (!s) return;
+  s.classList.add('out');
+  setTimeout(function() { s.remove(); }, 280);
+});
+</script>
 </body>
 </html>
