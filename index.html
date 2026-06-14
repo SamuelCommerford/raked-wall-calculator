@@ -85,10 +85,6 @@ header{width:100%;background:var(--blk);display:flex;align-items:center;justify-
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .field-row .field{margin-bottom:0}
 
-/* Wall dimension fields: input left, diagram right */
-.field-diagram{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
-.wall-svg{height:80px;width:auto;display:block;margin:0 auto}
-
 /* ── BUTTONS ── */
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 14px}
 .btn{border:none;font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;letter-spacing:.12em;text-transform:uppercase;padding:0;height:56px;cursor:pointer;border-radius:var(--r);-webkit-tap-highlight-color:transparent;transition:opacity .15s}
@@ -244,52 +240,25 @@ footer a{color:var(--org);text-decoration:none}
 
     <div class="field">
       <label id="lsh">Height at Short Point</label>
-      <div class="field-diagram">
-        <div class="ibox">
-          <input type="text" id="shortH" placeholder="0" inputmode="decimal" autocomplete="off"/>
-          <span class="ul" id="u1">mm</span>
-        </div>
-        <svg class="wall-svg" viewBox="0 0 100 78" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="10,36 90,8 90,68 10,68" fill="rgba(242,101,34,0.07)" stroke="none"/>
-          <line x1="10" y1="36" x2="90" y2="8" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="90" y1="8" x2="90" y2="68" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="10" y1="68" x2="90" y2="68" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="10" y1="36" x2="10" y2="68" stroke="#f26522" stroke-width="3" stroke-linecap="round"/>
-        </svg>
+      <div class="ibox">
+        <input type="text" id="shortH" placeholder="0" inputmode="decimal" autocomplete="off"/>
+        <span class="ul" id="u1">mm</span>
       </div>
     </div>
 
     <div class="field">
       <label id="llh">Height at Long Point</label>
-      <div class="field-diagram">
-        <div class="ibox">
-          <input type="text" id="longH" placeholder="0" inputmode="decimal" autocomplete="off"/>
-          <span class="ul" id="u2">mm</span>
-        </div>
-        <svg class="wall-svg" viewBox="0 0 100 78" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="10,36 90,8 90,68 10,68" fill="rgba(242,101,34,0.07)" stroke="none"/>
-          <line x1="10" y1="36" x2="90" y2="8" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="10" y1="36" x2="10" y2="68" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="10" y1="68" x2="90" y2="68" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="90" y1="8" x2="90" y2="68" stroke="#f26522" stroke-width="3" stroke-linecap="round"/>
-        </svg>
+      <div class="ibox">
+        <input type="text" id="longH" placeholder="0" inputmode="decimal" autocomplete="off"/>
+        <span class="ul" id="u2">mm</span>
       </div>
     </div>
 
     <div class="field">
       <label id="lwl">Bottom Plate Length</label>
-      <div class="field-diagram">
-        <div class="ibox">
-          <input type="text" id="wallLen" placeholder="0" inputmode="decimal" autocomplete="off"/>
-          <span class="ul" id="u3">mm</span>
-        </div>
-        <svg class="wall-svg" viewBox="0 0 100 78" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="10,36 90,8 90,68 10,68" fill="rgba(242,101,34,0.07)" stroke="none"/>
-          <line x1="10" y1="36" x2="90" y2="8" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="10" y1="36" x2="10" y2="68" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="90" y1="8" x2="90" y2="68" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="10" y1="68" x2="90" y2="68" stroke="#f26522" stroke-width="3" stroke-linecap="round"/>
-        </svg>
+      <div class="ibox">
+        <input type="text" id="wallLen" placeholder="0" inputmode="decimal" autocomplete="off"/>
+        <span class="ul" id="u3">mm</span>
       </div>
     </div>
 
