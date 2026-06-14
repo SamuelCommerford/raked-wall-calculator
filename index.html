@@ -172,6 +172,17 @@ td:last-child{border-right:none}
 .ad-view-all{display:flex;align-items:center;justify-content:center;background:var(--org);color:var(--wht);padding:16px;font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;min-height:var(--tap);-webkit-tap-highlight-color:transparent}
 .ad-view-all:active{opacity:.85}
 
+/* ── HOW-TO-MEASURE DIAGRAM ── */
+.diagram-wrap{padding:18px 14px 22px;background:var(--blk2)}
+.diagram-wrap svg{width:100%;height:auto;display:block}
+.diagram-wrap .dg-frame{fill:none;stroke:var(--wht);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.diagram-wrap .dg-dim{stroke:var(--org);stroke-width:2;fill:none}
+.diagram-wrap .dg-ref{stroke:var(--gry);stroke-width:2;stroke-dasharray:7 7}
+.diagram-wrap .dg-ang{stroke:var(--orgl);stroke-width:3;fill:none}
+.diagram-wrap .dg-arrow{fill:var(--orgl)}
+.diagram-wrap .dg-lbl{fill:var(--org);font-family:'Oswald',sans-serif;font-weight:600;font-size:17px;letter-spacing:.1em}
+.diagram-caption{padding:0 14px 4px;background:var(--blk2);font-size:12px;color:var(--gry);text-align:center}
+
 /* ── FOOTER ── */
 footer{margin-top:1.5rem;text-align:center;font-size:12px;color:var(--gryl);padding:0 16px 2rem}
 footer a{color:var(--org);text-decoration:none}
@@ -428,6 +439,69 @@ footer a{color:var(--org);text-decoration:none}
       </a>
     </div>
     <a href="https://www.tradienotes.com.au/store" target="_blank" class="ad-view-all">View All Products</a>
+  </div>
+
+  <!-- HOW TO MEASURE DIAGRAM -->
+  <div class="ad-section">
+    <div class="ad-heading">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f26522" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="M7 17L17 7"/><path d="M7 7h10v10"/>
+      </svg>
+      // How To Measure
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 660 700" xmlns="http://www.w3.org/2000/svg">
+        <!-- reference horizontal at short-point height -->
+        <line class="dg-ref" x1="140" y1="380" x2="540" y2="380"/>
+
+        <!-- wall frame: plates + studs + mid rail -->
+        <line class="dg-frame" x1="140" y1="580" x2="540" y2="580"/><!-- bottom plate -->
+        <line class="dg-frame" x1="140" y1="380" x2="540" y2="220"/><!-- top plate -->
+        <line class="dg-frame" x1="140" y1="380" x2="140" y2="580"/><!-- short stud -->
+        <line class="dg-frame" x1="540" y1="220" x2="540" y2="580"/><!-- long stud -->
+        <line class="dg-frame" x1="273" y1="327" x2="273" y2="580"/><!-- stud -->
+        <line class="dg-frame" x1="407" y1="273" x2="407" y2="580"/><!-- stud -->
+        <line class="dg-frame" x1="140" y1="460" x2="540" y2="460"/><!-- mid rail -->
+
+        <!-- angle of rake (corner) -->
+        <path class="dg-ang" d="M 222 380 A 82 82 0 0 0 215 350"/>
+        <path class="dg-arrow" d="M215 350 l9 1 l-4 7 z"/>
+
+        <!-- BOTTOM PLATE LENGTH -->
+        <line class="dg-dim" x1="140" y1="580" x2="140" y2="628"/>
+        <line class="dg-dim" x1="540" y1="580" x2="540" y2="628"/>
+        <line class="dg-dim" x1="140" y1="624" x2="540" y2="624"/>
+        <line class="dg-dim" x1="140" y1="617" x2="140" y2="631"/>
+        <line class="dg-dim" x1="540" y1="617" x2="540" y2="631"/>
+        <text class="dg-lbl" x="340" y="662" text-anchor="middle">BOTTOM PLATE LENGTH</text>
+
+        <!-- HEIGHT AT SHORT POINT -->
+        <line class="dg-dim" x1="140" y1="380" x2="92" y2="380"/>
+        <line class="dg-dim" x1="140" y1="580" x2="92" y2="580"/>
+        <line class="dg-dim" x1="96" y1="380" x2="96" y2="580"/>
+        <line class="dg-dim" x1="89" y1="380" x2="103" y2="380"/>
+        <line class="dg-dim" x1="89" y1="580" x2="103" y2="580"/>
+        <text class="dg-lbl" x="62" y="480" text-anchor="middle" transform="rotate(-90 62 480)">HEIGHT AT SHORT POINT</text>
+
+        <!-- HEIGHT AT LONG POINT -->
+        <line class="dg-dim" x1="540" y1="220" x2="588" y2="220"/>
+        <line class="dg-dim" x1="540" y1="580" x2="588" y2="580"/>
+        <line class="dg-dim" x1="584" y1="220" x2="584" y2="580"/>
+        <line class="dg-dim" x1="577" y1="220" x2="591" y2="220"/>
+        <line class="dg-dim" x1="577" y1="580" x2="591" y2="580"/>
+        <text class="dg-lbl" x="618" y="400" text-anchor="middle" transform="rotate(90 618 400)">HEIGHT AT LONG POINT</text>
+
+        <!-- TOP PLATE LENGTH -->
+        <line class="dg-dim" x1="140" y1="380" x2="140" y2="333"/>
+        <line class="dg-dim" x1="540" y1="220" x2="540" y2="173"/>
+        <line class="dg-dim" x1="140" y1="333" x2="540" y2="173"/>
+        <line class="dg-dim" x1="137" y1="326" x2="143" y2="340"/>
+        <line class="dg-dim" x1="537" y1="166" x2="543" y2="180"/>
+        <text class="dg-lbl" x="340" y="246" text-anchor="middle" transform="rotate(-21.8 340 253)">TOP PLATE LENGTH</text>
+      </svg>
+    </div>
+    <div class="diagram-caption">Enter the four measurements above to calculate stud lengths &amp; the rake angle</div>
+    <div style="height:14px;background:var(--blk2)"></div>
   </div>
 
   <footer>
