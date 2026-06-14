@@ -621,36 +621,24 @@ function parseIn(s){
     return isNaN(v)?null:v;
   }
 
-  // Dash format: "8-6", "8-6-1/2", "1-1/2"
-  if(s.indexOf('-')!==-1){
-    var p=s.split('-');
-    var last=p[p.length-1];
-    if(last.indexOf('/')!==-1){
-      var fp=last.split('/');
-      frac=(parseFloat(fp[0])||0)/(parseFloat(fp[1])||1);
-      p=p.slice(0,-1);
-    }
-    if(p.length===1){var v=(parseFloat(p[0])||0)+frac;return isNaN(v)?null:v;}
-    ft=parseFloat(p[0])||0;inc=parseFloat(p[1])||0;
-    var v=ft*12+inc+frac;return isNaN(v)?null:v;
+  // Space- or dash-separated: "8-6", "8 6", "2 4 3/16", "1-1/2", "1 1/2", "3/4", "16"
+  var p=s.split(/[\s-]+/).filter(Boolean);
+  if(p.length&&p[p.length-1].indexOf('/')!==-1){
+    var fp=p.pop().split('/');
+    frac=(parseFloat(fp[0])||0)/(parseFloat(fp[1])||1);
   }
-
-  // Fraction only: "1/2", "3/4"
-  if(s.indexOf('/')!==-1){
-    var fp=s.split('/');
-    var v=(parseFloat(fp[0])||0)/(parseFloat(fp[1])||1);
-    return isNaN(v)?null:v;
-  }
-
-  // Plain inches: "16", "96"
-  var v=parseFloat(s);
+  if(p.length===0){return isNaN(frac)?null:frac;}            // fraction only: "3/4"
+  if(p.length===1){var v=(parseFloat(p[0])||0)+frac;return isNaN(v)?null:v;}  // inches: "16", "6 1/2", "1-1/2"
+  ft=parseFloat(p[0])||0;inc=parseFloat(p[1])||0;             // feet + inches: "8-6", "2 4 3/16"
+  var v=ft*12+inc+frac;
   return isNaN(v)?null:v;
 }
 
 // For height/length fields: bare number treated as feet (8 → 96")
 function parseInFt(s){
   s=String(s||'').trim(); if(!s)return null;
-  if(s.indexOf("'")!==-1||s.indexOf('"')!==-1||s.indexOf('-')!==-1||s.indexOf('/')!==-1)
+  // Any separator (space, dash, quote, slash) => explicit ft-in; bare number => feet
+  if(/[\s'"\/-]/.test(s))
     return parseIn(s);
   var v=parseFloat(s);
   return isNaN(v)?null:v*12;
