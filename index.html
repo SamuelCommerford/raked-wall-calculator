@@ -81,6 +81,14 @@ header{width:100%;background:var(--blk);display:flex;align-items:center;justify-
 .ibox input::placeholder{color:var(--gryl);font-size:18px}
 .ibox .ul{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;color:var(--org);padding:0 14px 0 6px;flex-shrink:0;letter-spacing:.06em}
 
+/* ── DIMENSION FIELD WITH MINI WALL DIAGRAM ── */
+.dim-row{display:flex;align-items:stretch;gap:10px}
+.dim-row .ibox{flex:1}
+.mini-diagram{width:54px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.mini-diagram svg{width:100%;height:auto;display:block;overflow:visible}
+.mini-diagram polygon{fill:rgba(255,255,255,.05);stroke:var(--gryl);stroke-width:2;stroke-linejoin:round}
+.mini-hi{stroke:#ffaa00;stroke-width:6;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(255,170,0,.9))}
+
 /* Two-col grid for plate thickness fields */
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .field-row .field{margin-bottom:0}
@@ -238,27 +246,51 @@ footer a{color:var(--org);text-decoration:none}
   <div class="form-wrap">
     <div class="section-label">— Wall Dimensions</div>
 
-    <div class="field">
+    <div class="field dim-field">
       <label id="lsh">Height at Short Point</label>
-      <div class="ibox">
-        <input type="text" id="shortH" placeholder="0" inputmode="decimal" autocomplete="off"/>
-        <span class="ul" id="u1">mm</span>
+      <div class="dim-row">
+        <div class="mini-diagram">
+          <svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,58 16,34 64,14 64,58"/>
+            <line class="mini-hi" x1="16" y1="58" x2="16" y2="34"/>
+          </svg>
+        </div>
+        <div class="ibox">
+          <input type="text" id="shortH" placeholder="0" inputmode="decimal" autocomplete="off"/>
+          <span class="ul" id="u1">mm</span>
+        </div>
       </div>
     </div>
 
-    <div class="field">
+    <div class="field dim-field">
       <label id="llh">Height at Long Point</label>
-      <div class="ibox">
-        <input type="text" id="longH" placeholder="0" inputmode="decimal" autocomplete="off"/>
-        <span class="ul" id="u2">mm</span>
+      <div class="dim-row">
+        <div class="mini-diagram">
+          <svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,58 16,34 64,14 64,58"/>
+            <line class="mini-hi" x1="64" y1="58" x2="64" y2="14"/>
+          </svg>
+        </div>
+        <div class="ibox">
+          <input type="text" id="longH" placeholder="0" inputmode="decimal" autocomplete="off"/>
+          <span class="ul" id="u2">mm</span>
+        </div>
       </div>
     </div>
 
-    <div class="field">
+    <div class="field dim-field">
       <label id="lwl">Bottom Plate Length</label>
-      <div class="ibox">
-        <input type="text" id="wallLen" placeholder="0" inputmode="decimal" autocomplete="off"/>
-        <span class="ul" id="u3">mm</span>
+      <div class="dim-row">
+        <div class="mini-diagram">
+          <svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,58 16,34 64,14 64,58"/>
+            <line class="mini-hi" x1="16" y1="58" x2="64" y2="58"/>
+          </svg>
+        </div>
+        <div class="ibox">
+          <input type="text" id="wallLen" placeholder="0" inputmode="decimal" autocomplete="off"/>
+          <span class="ul" id="u3">mm</span>
+        </div>
       </div>
     </div>
 
