@@ -191,6 +191,8 @@ td:last-child{border-right:none}
 .fb-text::placeholder{color:var(--gryl)}
 .fb-send{margin-top:10px;width:100%;background:var(--org);color:var(--wht);border:none;font-family:'Oswald',sans-serif;font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase;height:52px;border-radius:var(--r);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s}
 .fb-send:active{opacity:.75}
+.fb-alt{margin-top:10px;font-size:12px;color:var(--gry);text-align:center}
+.fb-alt a{color:var(--org);text-decoration:none;word-break:break-all}
 
 /* ── FOOTER ── */
 footer{margin-top:1.5rem;text-align:center;font-size:12px;color:var(--gryl);padding:0 16px 2rem}
@@ -276,7 +278,7 @@ footer a{color:var(--org);text-decoration:none}
           </svg>
         </div>
         <div class="ibox">
-          <input type="text" id="shortH" placeholder="0" inputmode="decimal" autocomplete="off"/>
+          <input type="text" id="shortH" placeholder="0" inputmode="decimal" autocomplete="off" oninput="doCalc()"/>
           <span class="ul" id="u1">mm</span>
         </div>
       </div>
@@ -292,7 +294,7 @@ footer a{color:var(--org);text-decoration:none}
           </svg>
         </div>
         <div class="ibox">
-          <input type="text" id="longH" placeholder="0" inputmode="decimal" autocomplete="off"/>
+          <input type="text" id="longH" placeholder="0" inputmode="decimal" autocomplete="off" oninput="doCalc()"/>
           <span class="ul" id="u2">mm</span>
         </div>
       </div>
@@ -308,7 +310,7 @@ footer a{color:var(--org);text-decoration:none}
           </svg>
         </div>
         <div class="ibox">
-          <input type="text" id="wallLen" placeholder="0" inputmode="decimal" autocomplete="off"/>
+          <input type="text" id="wallLen" placeholder="0" inputmode="decimal" autocomplete="off" oninput="doCalc()"/>
           <span class="ul" id="u3">mm</span>
         </div>
       </div>
@@ -321,14 +323,14 @@ footer a{color:var(--org);text-decoration:none}
       <div class="field">
         <label id="lbp">Bottom Plate</label>
         <div class="ibox">
-          <input type="text" id="botPl" placeholder="45" inputmode="decimal" autocomplete="off"/>
+          <input type="text" id="botPl" placeholder="45" inputmode="decimal" autocomplete="off" oninput="doCalc()"/>
           <span class="ul" id="u4">mm</span>
         </div>
       </div>
       <div class="field">
         <label id="ltp">Top Plate</label>
         <div class="ibox">
-          <input type="text" id="topPl" placeholder="45" inputmode="decimal" autocomplete="off"/>
+          <input type="text" id="topPl" placeholder="45" inputmode="decimal" autocomplete="off" oninput="doCalc()"/>
           <span class="ul" id="u5">mm</span>
         </div>
       </div>
@@ -525,6 +527,7 @@ footer a{color:var(--org);text-decoration:none}
       <div class="fb-intro">If anything isn't working or can be improved, please send us a message.</div>
       <textarea class="fb-text" id="fbText" placeholder="Type your feedback here…"></textarea>
       <button class="fb-send" onclick="sendFeedback()">Send Feedback</button>
+      <div class="fb-alt">or email us directly at <a href="mailto:admin@tradienotes.com.au">admin@tradienotes.com.au</a></div>
     </div>
   </div>
 
@@ -569,6 +572,11 @@ function onToggle(){
 }
 
 function setU(u){
+  // changing units invalidates existing entries (a "2400" in mm is not 2400 in imperial)
+  if(u!==unit){
+    ['shortH','longH','wallLen','botPl','topPl'].forEach(function(id){document.getElementById(id).value='';});
+    initRows();
+  }
   unit=u;
   document.getElementById('bmm').classList.toggle('on',u==='mm');
   document.getElementById('bin').classList.toggle('on',u==='in');
@@ -578,7 +586,7 @@ function setU(u){
   Object.keys(m).forEach(function(id){document.getElementById(id).textContent=m[id];});
   ['u1','u2','u3'].forEach(function(id){document.getElementById(id).textContent=l;});
   ['u4','u5'].forEach(function(id){document.getElementById(id).textContent=lp;});
-  document.getElementById('th1').textContent='('+(u==='mm'?'mm':'ft-in')+')';
+  document.getElementById('th1').textContent='('+(u==='mm'?'mm':'in')+')';   // positions entered in inches
   document.getElementById('th2').textContent='('+l+')';
   document.getElementById('th3').textContent='('+l+')';
   if(u==='in'){
@@ -599,37 +607,44 @@ function setU(u){
 
 function gcd(a,b){return b<0.001?a:gcd(b,a%b);}
 
+// strict positive-number token check (no junk like "8ft")
+function isNum(t){return /^\d*\.?\d+$/.test(t);}
+
+// Parse an imperial length string -> inches. Returns null on anything malformed.
+// Accepts: feet mark ' , inch mark " , space- or dash-separated feet/inches, fractions.
+//   "8'6\""  "8'-6 1/2\""  "8'"  "2 4 3/16"  "8-6"  "1-1/2"  "1 1/2"  "3/4"  "16"
 function parseIn(s){
   s=String(s||'').trim();
   if(!s)return null;
   var ft=0,inc=0,frac=0;
 
-  // ' / " notation: e.g. "8'6"", "8'-6 1/2"", "8'", "6"", "1/2""
-  if(s.indexOf("'")!==-1||s.indexOf('"')!==-1){
-    if(s.indexOf("'")!==-1){
-      ft=parseFloat(s)||0;
-      s=s.slice(s.indexOf("'")+1).trim().replace(/^-/,'').trim();
-    }
-    s=s.replace(/"/g,'').trim();
+  // strip explicit feet mark
+  if(s.indexOf("'")!==-1){
+    var fpart=s.slice(0,s.indexOf("'")).trim();
+    if(fpart&&!isNum(fpart))return null;
+    ft=fpart?parseFloat(fpart):0;
+    s=s.slice(s.indexOf("'")+1);
+  }
+  // drop inch mark + a leading dash (the feet/inch separator)
+  s=s.replace(/"/g,'').trim().replace(/^-/,'').trim();
+
+  if(s){
     var p=s.split(/[\s-]+/).filter(Boolean);
+    // trailing fraction
     if(p.length&&p[p.length-1].indexOf('/')!==-1){
       var fp=p.pop().split('/');
-      frac=(parseFloat(fp[0])||0)/(parseFloat(fp[1])||1);
+      if(fp.length!==2||!isNum(fp[0])||!isNum(fp[1])||parseFloat(fp[1])===0)return null;
+      frac=parseFloat(fp[0])/parseFloat(fp[1]);
     }
-    if(p.length) inc=parseFloat(p[0])||0;
-    var v=ft*12+inc+frac;
-    return isNaN(v)?null:v;
+    for(var k=0;k<p.length;k++){if(!isNum(p[k]))return null;}
+    if(p.length>2)return null;
+    if(p.length===1){
+      inc=parseFloat(p[0]);
+    } else if(p.length===2){
+      if(ft!==0){ inc=parseFloat(p[0]); }      // feet already given via '
+      else { ft=parseFloat(p[0]); inc=parseFloat(p[1]); }
+    }
   }
-
-  // Space- or dash-separated: "8-6", "8 6", "2 4 3/16", "1-1/2", "1 1/2", "3/4", "16"
-  var p=s.split(/[\s-]+/).filter(Boolean);
-  if(p.length&&p[p.length-1].indexOf('/')!==-1){
-    var fp=p.pop().split('/');
-    frac=(parseFloat(fp[0])||0)/(parseFloat(fp[1])||1);
-  }
-  if(p.length===0){return isNaN(frac)?null:frac;}            // fraction only: "3/4"
-  if(p.length===1){var v=(parseFloat(p[0])||0)+frac;return isNaN(v)?null:v;}  // inches: "16", "6 1/2", "1-1/2"
-  ft=parseFloat(p[0])||0;inc=parseFloat(p[1])||0;             // feet + inches: "8-6", "2 4 3/16"
   var v=ft*12+inc+frac;
   return isNaN(v)?null:v;
 }
@@ -640,8 +655,8 @@ function parseInFt(s){
   // Any separator (space, dash, quote, slash) => explicit ft-in; bare number => feet
   if(/[\s'"\/-]/.test(s))
     return parseIn(s);
-  var v=parseFloat(s);
-  return isNaN(v)?null:v*12;
+  if(!isNum(s))return null;   // reject "8ft", "abc", "-5"
+  return parseFloat(s)*12;
 }
 
 function formatIn(v){
@@ -654,23 +669,22 @@ function formatIn(v){
   if(wi===12){ft++;wi=0;}
   var fstr='';
   if(sx>0){var g=gcd(sx,16);fstr=' '+(sx/g)+'/'+(16/g);}
-  if(wi===0&&fstr) return ft+"'"+fstr+'"';
-  return ft+"'-"+wi+fstr+'"';
+  return ft+"'-"+wi+fstr+'"';   // consistent architectural notation, e.g. 4'-0 3/8"
 }
 
 function gv(id){
   var s=document.getElementById(id).value;
   if(unit==='in') return parseIn(s);
-  var v=parseFloat(s);
-  return isNaN(v)?null:v;
+  s=String(s||'').trim();
+  return (s&&isNum(s))?parseFloat(s):null;
 }
 
 // Use for height/length fields so bare "8" means 8 feet
 function gvFt(id){
   var s=document.getElementById(id).value;
   if(unit==='in') return parseInFt(s);
-  var v=parseFloat(s);
-  return isNaN(v)?null:v;
+  s=String(s||'').trim();
+  return (s&&isNum(s))?parseFloat(s):null;
 }
 
 function fs(v){
@@ -691,7 +705,8 @@ function ftp(v){
 function doCalc(){
   var Hs=gvFt('shortH'),Hl=gvFt('longH'),L=gvFt('wallLen'),Bp=gv('botPl'),Tp=gv('topPl');
   _c={Hs:Hs,Hl:Hl,L:L,Bp:Bp,Tp:Tp};
-  if(L===null||Hs===null||Hl===null){
+  // require valid, physically-possible dimensions (length>0, heights>=0)
+  if(L==null||Hs==null||Hl==null||L<=0||Hs<0||Hl<0){
     document.getElementById('r-ang').textContent='\u2014';
     document.getElementById('r-tpl').textContent='\u2014';
     renderTable();return;
@@ -699,29 +714,36 @@ function doCalc(){
   var rise=Hl-Hs;
   var tpl=Math.sqrt(L*L+rise*rise);
   _ang=Math.atan2(rise,L);
-  var deg=_ang*180/Math.PI;
+  var deg=Math.abs(_ang*180/Math.PI);   // magnitude; Short/Long labels convey direction
   document.getElementById('r-ang').textContent=deg.toFixed(1)+'\u00b0';
   document.getElementById('r-tpl').textContent=fsu(tpl);
   renderTable();
 }
 
 function topPos(bp){
-  if(bp===null||isNaN(bp))return null;
-  if(_c.L===null)return bp;
+  if(bp==null||isNaN(bp))return null;
+  if(_c.L==null||_c.L<=0)return null;
+  if(bp<0||bp>_c.L+1e-6)return null;       // position off the plate
   return bp/Math.cos(_ang);
 }
 
 function studLen(bp){
   var Hs=_c.Hs,Hl=_c.Hl,L=_c.L,Bp=_c.Bp,Tp=_c.Tp;
-  if(L===null||Hs===null||Hl===null||bp===null)return null;
+  if(L==null||Hs==null||Hl==null||bp==null||L<=0)return null;
+  if(bp<0||bp>L+1e-6)return null;          // position off the plate
   var wallH=Hs+(Hl-Hs)*(bp/L);
-  var stud=wallH-(Bp||0)-(Tp||0);
+  // top plate sits on the slope: its vertical allowance is Tp/cos(angle), not Tp
+  var stud=wallH-(Bp||0)-((Tp||0)/Math.cos(_ang));
   if(fromLP) stud+=(Bp||(unit==='mm'?45:1.5))*Math.tan(_ang);
-  return Math.max(0,stud);
+  return stud<0?null:stud;                 // plates exceed wall height -> blank, not silent 0
 }
 
 function calcRow(i){
-  var bp=rows[i].pos!==''?(unit==='in'?parseInFt(rows[i].pos):parseFloat(rows[i].pos)):null;
+  var raw=rows[i].pos, bp=null;
+  if(raw!=null&&String(raw).trim()!==''){
+    if(unit==='in'){ bp=parseIn(raw); }      // stud spacing: bare number = INCHES (16 = 16")
+    else { var t=String(raw).trim(); bp=isNum(t)?parseFloat(t):null; }
+  }
   return {tp:topPos(bp),sl:studLen(bp)};
 }
 
@@ -738,7 +760,7 @@ function renderTable(){
     var c=calcRow(i);
     var inp=i===0
       ?'<input class="ci locked" type="text" inputmode="decimal" value="'+(unit==='in'?"0'-0\"":'0')+'" readonly/>'
-      :'<input class="ci" type="text" inputmode="decimal" pattern="[0-9./\\-]*" placeholder="" value="'+(r.pos||'')+'" oninput="rows['+i+'].pos=this.value;updateRowCalc('+i+')"/>';
+      :'<input class="ci" type="text" inputmode="decimal" pattern="[0-9 ./\\-]*" placeholder="" value="'+(r.pos||'')+'" oninput="rows['+i+'].pos=this.value;updateRowCalc('+i+')"/>';
     return '<tr>'+
       '<td><div class="tdn">'+(i+1)+'</div></td>'+
       '<td>'+inp+'</td>'+
