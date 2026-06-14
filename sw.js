@@ -1,4 +1,4 @@
-var CACHE = 'raked-wall-v11';
+var CACHE = 'raked-wall-v12';
 
 var scope = self.registration.scope;
 var CORE = [

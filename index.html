@@ -114,9 +114,15 @@ header{width:100%;background:var(--blk);display:flex;align-items:center;justify-
 .sh-r:active{background:rgba(0,0,0,.55)}
 
 /* ── STUD TOGGLE BAR ── */
-.stud-toggle-bar{background:var(--blk3);border-bottom:1px solid var(--gryl);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stud-toggle-bar{background:var(--blk3);border-bottom:1px solid var(--gryl);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
 .stud-toggle-label{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gry)}
 .stud-toggle-label span{color:var(--org)}
+.stud-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-left:auto}
+.stud-thick{display:flex;align-items:center;gap:6px;background:var(--blk5);border:1.5px solid var(--gryl);border-radius:var(--r);padding:3px 8px}
+.stud-thick .st-lbl{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gry);white-space:nowrap}
+.stud-thick input{width:48px;background:none;border:none;color:var(--wht);font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;padding:6px 0;outline:none;text-align:center}
+.stud-thick input::placeholder{color:var(--gryl)}
+.stud-thick .st-u{font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;color:var(--org)}
 .tog-wrap{display:flex;align-items:center;gap:10px}
 .tog-opt{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gryl);transition:color .2s}
 .tog-opt.active{color:var(--wht)}
@@ -367,16 +373,23 @@ footer a{color:var(--org);text-decoration:none}
       </div>
     </div>
 
-    <!-- SP / LP TOGGLE -->
+    <!-- SP / LP TOGGLE + STUD THICKNESS -->
     <div class="stud-toggle-bar">
       <div class="stud-toggle-label">Length from: <span id="tog-label">Short Point</span></div>
-      <div class="tog-wrap">
-        <span class="tog-opt active" id="tog-sp">S/P</span>
-        <label class="switch">
-          <input type="checkbox" id="studToggle" onchange="onToggle()"/>
-          <span class="slider"></span>
-        </label>
-        <span class="tog-opt" id="tog-lp">L/P</span>
+      <div class="stud-right">
+        <div class="stud-thick">
+          <span class="st-lbl">Stud thk</span>
+          <input type="text" id="studTh" inputmode="decimal" autocomplete="off" placeholder="45" oninput="doCalc()"/>
+          <span class="st-u" id="uStud">mm</span>
+        </div>
+        <div class="tog-wrap">
+          <span class="tog-opt active" id="tog-sp">S/P</span>
+          <label class="switch">
+            <input type="checkbox" id="studToggle" onchange="onToggle()"/>
+            <span class="slider"></span>
+          </label>
+          <span class="tog-opt" id="tog-lp">L/P</span>
+        </div>
       </div>
     </div>
 
@@ -574,7 +587,7 @@ function onToggle(){
 function setU(u){
   // changing units invalidates existing entries (a "2400" in mm is not 2400 in imperial)
   if(u!==unit){
-    ['shortH','longH','wallLen','botPl','topPl'].forEach(function(id){document.getElementById(id).value='';});
+    ['shortH','longH','wallLen','botPl','topPl','studTh'].forEach(function(id){document.getElementById(id).value='';});
     initRows();
   }
   unit=u;
@@ -586,6 +599,7 @@ function setU(u){
   Object.keys(m).forEach(function(id){document.getElementById(id).textContent=m[id];});
   ['u1','u2','u3'].forEach(function(id){document.getElementById(id).textContent=l;});
   ['u4','u5'].forEach(function(id){document.getElementById(id).textContent=lp;});
+  document.getElementById('uStud').textContent=lp;   // stud thickness in same unit as plates
   document.getElementById('th1').textContent='('+(u==='mm'?'mm':'in')+')';   // positions entered in inches
   document.getElementById('th2').textContent='('+l+')';
   document.getElementById('th3').textContent='('+l+')';
@@ -595,12 +609,14 @@ function setU(u){
     document.getElementById('wallLen').placeholder='12-0';
     document.getElementById('botPl').placeholder='1-1/2';
     document.getElementById('topPl').placeholder='1-1/2';
+    document.getElementById('studTh').placeholder='1-1/2';
   } else {
     document.getElementById('shortH').placeholder='0';
     document.getElementById('longH').placeholder='0';
     document.getElementById('wallLen').placeholder='0';
     document.getElementById('botPl').placeholder='45';
     document.getElementById('topPl').placeholder='45';
+    document.getElementById('studTh').placeholder='45';
   }
   doCalc();
 }
@@ -703,8 +719,8 @@ function ftp(v){
 }
 
 function doCalc(){
-  var Hs=gvFt('shortH'),Hl=gvFt('longH'),L=gvFt('wallLen'),Bp=gv('botPl'),Tp=gv('topPl');
-  _c={Hs:Hs,Hl:Hl,L:L,Bp:Bp,Tp:Tp};
+  var Hs=gvFt('shortH'),Hl=gvFt('longH'),L=gvFt('wallLen'),Bp=gv('botPl'),Tp=gv('topPl'),St=gv('studTh');
+  _c={Hs:Hs,Hl:Hl,L:L,Bp:Bp,Tp:Tp,St:St};
   // require valid, physically-possible dimensions (length>0, heights>=0)
   if(L==null||Hs==null||Hl==null||L<=0||Hs<0||Hl<0){
     document.getElementById('r-ang').textContent='\u2014';
@@ -734,7 +750,8 @@ function studLen(bp){
   var wallH=Hs+(Hl-Hs)*(bp/L);
   // top plate sits on the slope: its vertical allowance is Tp/cos(angle), not Tp
   var stud=wallH-(Bp||0)-((Tp||0)/Math.cos(_ang));
-  if(fromLP) stud+=(Bp||(unit==='mm'?45:1.5))*Math.tan(_ang);
+  // Long-Point edge is longer than Short-Point by (stud thickness)*tan(angle)
+  if(fromLP){var st=(_c.St!=null&&_c.St>0)?_c.St:(unit==='mm'?45:1.5);stud+=st*Math.tan(_ang);}
   return stud<0?null:stud;                 // plates exceed wall height -> blank, not silent 0
 }
 
@@ -782,7 +799,7 @@ function addRow(){rows.push({pos:''});renderTable();}
 function removeRow(){if(rows.length>1){rows.pop();renderTable();}}
 
 function clearAll(){
-  ['shortH','longH','wallLen','botPl','topPl'].forEach(function(id){document.getElementById(id).value='';});
+  ['shortH','longH','wallLen','botPl','topPl','studTh'].forEach(function(id){document.getElementById(id).value='';});
   _c={};_ang=0;initRows();
   document.getElementById('r-ang').textContent='\u2014';
   document.getElementById('r-tpl').textContent='\u2014';
