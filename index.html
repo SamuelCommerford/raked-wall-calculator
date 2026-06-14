@@ -183,6 +183,15 @@ td:last-child{border-right:none}
 .diagram-wrap .dg-lbl{fill:var(--org);font-family:'Oswald',sans-serif;font-weight:600;font-size:17px;letter-spacing:.1em}
 .diagram-caption{padding:0 14px 4px;background:var(--blk2);font-size:12px;color:var(--gry);text-align:center}
 
+/* ── FEEDBACK ── */
+.fb-wrap{padding:16px 14px 18px;background:var(--blk2)}
+.fb-intro{font-size:13px;color:var(--gry);line-height:1.5;margin-bottom:12px}
+.fb-text{width:100%;background:var(--steel);border:1.5px solid var(--gryl);border-radius:var(--r);color:var(--wht);font-family:'Roboto',sans-serif;font-size:15px;line-height:1.5;padding:12px;outline:none;resize:vertical;min-height:110px;transition:border-color .15s}
+.fb-text:focus{border-color:var(--org)}
+.fb-text::placeholder{color:var(--gryl)}
+.fb-send{margin-top:10px;width:100%;background:var(--org);color:var(--wht);border:none;font-family:'Oswald',sans-serif;font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase;height:52px;border-radius:var(--r);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s}
+.fb-send:active{opacity:.75}
+
 /* ── FOOTER ── */
 footer{margin-top:1.5rem;text-align:center;font-size:12px;color:var(--gryl);padding:0 16px 2rem}
 footer a{color:var(--org);text-decoration:none}
@@ -504,6 +513,21 @@ footer a{color:var(--org);text-decoration:none}
     <div style="height:14px;background:var(--blk2)"></div>
   </div>
 
+  <!-- FEEDBACK -->
+  <div class="ad-section">
+    <div class="ad-heading">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f26522" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      // Feedback
+    </div>
+    <div class="fb-wrap">
+      <div class="fb-intro">If anything isn't working or can be improved, please send us a message.</div>
+      <textarea class="fb-text" id="fbText" placeholder="Type your feedback here…"></textarea>
+      <button class="fb-send" onclick="sendFeedback()">Send Feedback</button>
+    </div>
+  </div>
+
   <footer>
     <p>&copy; <a href="https://www.tradienotes.com.au" target="_blank">Tradie Notes</a> &mdash; Built for tradies on the tools</p>
   </footer>
@@ -734,6 +758,14 @@ function renderTable(){
       '<td><div class="tdh">'+fs(c.sl)+'</div></td>'+
     '</tr>';
   }).join('');
+}
+
+function sendFeedback(){
+  var t=document.getElementById('fbText').value.trim();
+  if(!t){document.getElementById('fbText').focus();return;}
+  var subject=encodeURIComponent('Raked Wall Calculator — Feedback');
+  var body=encodeURIComponent(t);
+  window.location.href='mailto:admin@tradienotes.com.au?subject='+subject+'&body='+body;
 }
 
 function addRow(){rows.push({pos:''});renderTable();}
